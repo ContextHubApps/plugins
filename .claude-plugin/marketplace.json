@@ -1,0 +1,15 @@
+{
+  "name": "contexthub",
+  "description": "ContextHub plugins for AI coding agents. Published from the ContextHub source repo; do not edit here, changes are overwritten on release.",
+  "owner": {
+    "name": "ContextHub",
+    "url": "https://trycontexthub.com"
+  },
+  "plugins": [
+    {
+      "name": "contexthub",
+      "source": "./claude-code/contexthub",
+      "description": "Reach your organization's permissioned context over MCP, with browser sign-in and commands that explain who can see what."
+    }
+  ]
+}

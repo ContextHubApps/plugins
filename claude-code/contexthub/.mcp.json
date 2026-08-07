@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "contexthub": {
+      "type": "http",
+      "url": "https://mcp.trycontexthub.com/mcp",
+      "oauth": {}
+    }
+  }
+}
