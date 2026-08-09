@@ -9,17 +9,71 @@ afterthought.
 > open PRs here, edits are overwritten by the next publish. File issues at
 > [trycontexthub.com](https://trycontexthub.com).
 
-## Claude Code
+## Why bother
+
+Your agent already knows how software works. It knows nothing about **how your company
+works** - why you picked Postgres over Dynamo, who owns the billing service, what the
+last postmortem concluded. Ask it today and you get confident generic advice, or an
+apology about not having access to your internal docs.
+
+ContextHub is where that knowledge lives, filtered to what you're actually granted. The
+plugin is what makes your agent reach for it unprompted, and - just as importantly - what
+stops it from telling you "your org never documented this" when the honest answer is "I
+can't see that."
+
+## Get connected (3 steps, about a minute)
+
+**1. Add the marketplace and install.**
 
 ```
 /plugin marketplace add ContextHubApps/plugins
 /plugin install contexthub@contexthub
+```
+
+**2. Restart Claude Code.** The plugin's MCP server only comes up on a fresh start.
+Skipping this is the single most common reason the tools don't appear.
+
+**3. Connect.**
+
+```
 /contexthub:connect
 ```
 
-Auth is OAuth with dynamic client registration. **There is no token to mint or
-paste** - `/contexthub:connect` triggers a browser sign-in, and this repo ships no
-credential of any kind.
+A browser window opens. Sign in. That's it.
+
+**There is no token to mint or paste.** Auth is OAuth with dynamic client registration,
+so the client registers itself and this repo ships no credential of any kind.
+
+> **You'll see an HTTP 401 first, and that's normal.** The 401 carries the header that
+> *triggers* the browser sign-in - it's the mechanism working, not a failure. Don't debug it.
+
+Once you're in, `/contexthub:connect` verifies with a real call and tells you which state
+you're in: connected and granted, connected but reaching nothing, or not signed in. Those
+three need completely different fixes.
+
+### Copy-paste: fill the store
+
+New store with nothing in it? Semantic search works, but it has nothing to search. Paste
+this to seed it from what your agent already learned about your project:
+
+```
+Use ContextHub as our team's long-term memory. Call list_org_folders to see what
+I reach. Then take everything you've learned about this project - architecture
+decisions, gotchas, conventions, anything a new teammate would need - and write
+each as its own doc with write_org_doc. Match the frontmatter (type + tags) of
+neighboring files so they're findable. If you've genuinely learned nothing yet,
+write one short doc capturing what this repo is and how to run it, so the store
+isn't empty. Tell me what you wrote and where.
+```
+
+### Copy-paste: make it a habit
+
+```
+From now on, check ContextHub before answering anything about how *we* do things,
+and write durable conclusions back with write_org_doc so the next session inherits
+them. If a search comes back thin, say it may be a permission boundary rather than
+telling me nothing exists.
+```
 
 | Command | Answers |
 |---------|---------|
@@ -27,11 +81,21 @@ credential of any kind.
 | `/contexthub:permissions` | What does *this* credential actually reach? |
 | `/contexthub:share` | What am I about to share, and how far does it cascade? |
 | `/contexthub:who-can-see` | Who can see this? |
+| `/contexthub:catch-up` | What was I working on, and what's the next step? |
 
-Also included: two skills (`authorization-model`, `connection`) that carry the real
-authorization model, and two agents (`context-researcher` for grounded retrieve-and-cite
-work, `access-reviewer` for read-only access review, read-only by tool allowlist rather
-than by instruction).
+Also included, and triggered by what you ask rather than by a slash command:
+
+| Skill | Fires when |
+|---|---|
+| `catch-up` | You refer to ongoing work as though the agent should already know — the same ground as `/contexthub:catch-up`, without having to ask for it |
+| `sync-conversation` | You want this session written back to the store as a durable document |
+| `deleting` | Something is about to be removed, and the blast radius needs saying out loud first |
+| `authorization-model` | Anything turns on who can read what, or a result comes back thinner than expected |
+| `connection` | The tools are missing, returning 401, or connected but reaching nothing |
+
+Plus two agents: `context-researcher` for grounded retrieve-and-cite work, and
+`access-reviewer` for read-only access review — read-only by tool allowlist rather than
+by instruction.
 
 **Self-hosted?** The endpoint is a single literal line in
 `claude-code/contexthub/.mcp.json` - point it at your own host (keeping the `/mcp`
@@ -45,6 +109,19 @@ ContextHub is a plain MCP server, so any MCP-capable client can connect to
 `https://mcp.trycontexthub.com/mcp` today - OAuth for humans, or a `cht_` bearer
 token for headless and CI use. Client-specific packaging lands here as its own
 directory (`codex/`, and so on) as each client's extension model supports it.
+
+**If your client doesn't do OAuth, you need a bearer token.** Many desktop clients
+send only the headers you configure and never walk the discovery chain, so they get
+the initial 401 and report "startup failed." Mint a token and set one header:
+
+| Field | Value |
+|---|---|
+| URL | `https://mcp.trycontexthub.com/mcp` |
+| Header name | `Authorization` |
+| Header value | `Bearer cht_...` |
+
+Scope it by minting against a narrow principal - a token in a desktop app's config
+carries that principal's roles, and it's revocable if the config ever leaks.
 
 ## The one thing worth knowing
 

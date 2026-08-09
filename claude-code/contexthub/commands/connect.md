@@ -55,15 +55,32 @@ Then point onward, without re-explaining them:
 
 - `/contexthub:permissions` for what this credential reaches.
 - `/contexthub:who-can-see` for who else can reach something.
-- `/mcp__contexthub__contexthub_find` to prime a retrieve-then-cite pass.
+- `search_org_knowledge` to prime a retrieve-then-cite pass.
+
+**If the store is reachable but nearly empty, offer to seed it.** A connected user staring at an empty store is the most common dead end in first-touch, and the fix is one paste. Show them this, verbatim, in a code block so it is copyable:
+
+```
+Use ContextHub as our team's long-term memory. Call list_org_folders to see what
+I reach. Then take everything you've learned about this project - architecture
+decisions, gotchas, conventions, anything a new teammate would need - and write
+each as its own doc with write_org_doc. Match the frontmatter (type + tags) of
+neighboring files so they're findable. If you've genuinely learned nothing yet,
+write one short doc capturing what this repo is and how to run it, so the store
+isn't empty. Tell me what you wrote and where.
+```
+
+Say plainly that semantic search is already on server-side (`vectorIndex: true`); what a new store lacks is content, not capability. Do not run this for them unprompted - writing to a shared org store is the user's call.
 
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
 |---|---|---|
+| Tools absent from `/mcp` entirely | Plugin installed but Claude Code not restarted since | Restart Claude Code — `/reload-plugins` does not bring up the MCP server |
+| Tools vanished after a crash | Prior session died without a clean shutdown, so project plugin state was never written back | Restart. The credential is almost certainly still valid; do not re-auth first |
 | 401 loop, sign-in never sticks | Browser flow was abandoned or cookies blocked | Re-run `/mcp`, complete the flow in a normal browser window |
 | 404 on every call | Endpoint points at the console host instead of the MCP host | It must be `https://mcp.trycontexthub.com/mcp`, not `https://trycontexthub.com` |
 | Connects, zero folders | No org membership or no grants | Phase 3 |
+| "startup failed" in a non-Claude client | That client sends only configured headers and never walks the OAuth discovery chain, so it gets the initial 401 | Set `Authorization: Bearer cht_…` as a static header. See the headless note below |
 | Works locally, fails in CI | No browser available for OAuth | See the headless note below |
 
 ## Headless fallback
