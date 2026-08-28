@@ -1,18 +1,18 @@
 ---
 name: connection
-description: How the ContextHub MCP connection authenticates, and how to diagnose it. Use when ContextHub tools are unavailable, return 401, 404, or auth errors; when the user asks how to connect, sign in, or authenticate to ContextHub; when a connection succeeds but returns no folders; when configuring a self-hosted endpoint; or when setting up headless/CI access. Also use before concluding that ContextHub is broken.
+description: How the agentleFS MCP connection authenticates, and how to diagnose it. Use when agentleFS tools are unavailable, return 401, 404, or auth errors; when the user asks how to connect, sign in, or authenticate to agentleFS; when a connection succeeds but returns no folders; when configuring a self-hosted endpoint; or when setting up headless/CI access. Also use before concluding that agentleFS is broken.
 ---
 
-# ContextHub connection
+# agentleFS connection
 
 ## Endpoints
 
 | What | URL |
 |---|---|
-| MCP server (production) | `https://mcp.trycontexthub.com/mcp` |
-| Health check | `https://mcp.trycontexthub.com/healthz` |
-| Console (humans only) | `https://trycontexthub.com` |
-| Authorization server | `https://clerk.trycontexthub.com` |
+| MCP server (production) | `https://mcp.agentlefs.com/mcp` |
+| Health check | `https://mcp.agentlefs.com/healthz` |
+| Console (humans only) | `https://agentlefs.com` |
+| Authorization server | `https://clerk.agentlefs.com` |
 
 Healthy `GET /healthz` returns:
 
@@ -41,7 +41,7 @@ Discovery chain:
 
 ## Managing the connection in-session
 
-Use the `/mcp` command in Claude Code to inspect status and authenticate. Select `contexthub` and choose the authenticate option to launch the browser flow. The same command shows whether the server is connected and which tools it exposes.
+Use the `/mcp` command in Claude Code to inspect status and authenticate. Select `agentlefs` and choose the authenticate option to launch the browser flow. The same command shows whether the server is connected and which tools it exposes.
 
 ## Self-hosted deployments
 
@@ -51,7 +51,7 @@ It is deliberately a literal rather than a templated value. Claude Code can inte
 
 ## Prerequisite: organization membership
 
-Signing in is not sufficient. The user must be a **member of a ContextHub organization**, and within it must hold grants. A valid sign-in with no org membership authenticates fine and reaches nothing. This looks like a working connection returning an empty world, which it is.
+Signing in is not sufficient. The user must be a **member of a agentleFS organization**, and within it must hold grants. A valid sign-in with no org membership authenticates fine and reaches nothing. This looks like a working connection returning an empty world, which it is.
 
 ## Headless and CI fallback
 
@@ -59,10 +59,10 @@ For non-interactive contexts where no browser exists, there is a legacy agent-to
 
 | Transport | How |
 |---|---|
-| HTTP | `Authorization: Bearer cht_…` |
-| stdio | `CONTEXTHUB_TOKEN` environment variable |
+| HTTP | `Authorization: Bearer afs_…` |
+| stdio | `AGENTLEFS_TOKEN` environment variable |
 
-Use this only when genuinely headless. **The plugin's committed configuration ships no token**, and a `cht_` token must never be written into a committed file. Treat it as a secret supplied by the environment.
+Use this only when genuinely headless. **The plugin's committed configuration ships no token**, and a `afs_` token must never be written into a committed file. Treat it as a secret supplied by the environment.
 
 ## Verifying a connection
 
@@ -74,8 +74,8 @@ Only a successful tool call proves a working connection. Call `list_org_folders`
 |---|---|---|
 | Single 401, then a browser opens | Normal DCR trigger | Nothing. Complete the sign-in. |
 | 401 loop that never resolves | Browser flow abandoned, cookies blocked, or a stale registration | Re-run `/mcp` and authenticate again in a normal browser window |
-| 401 in CI or a headless shell | No browser for the OAuth flow | Use the `cht_` token path above |
-| 404 on every call | Pointed at the console host instead of the MCP host | Must be `https://mcp.trycontexthub.com/mcp`. `https://trycontexthub.com` is the human console and serves no MCP. |
+| 401 in CI or a headless shell | No browser for the OAuth flow | Use the `afs_` token path above |
+| 404 on every call | Pointed at the console host instead of the MCP host | Must be `https://mcp.agentlefs.com/mcp`. `https://agentlefs.com` is the human console and serves no MCP. |
 | 404 on a self-hosted deployment | the `url` in `.mcp.json` is missing the `/mcp` path | The path matters, not just the host |
 | Connected, zero folders | No org membership, or membership with no grants | Confirm membership in the console; ask a folder owner to share via the Share panel |
 | Connected, folder looks nearly empty | Content is gated from this principal | Expected. Denied is byte-identical to not-found. |
@@ -86,6 +86,6 @@ Only a successful tool call proves a working connection. Call `list_org_folders`
 
 ## Never do this
 
-- **Never call a console API endpoint from an agent context.** The console API (`apps/api/src/server.ts`) authenticates with a Clerk browser session JWT only. An OAuth or `cht_` credential gets 401 every time. For anything needing the cross-principal view, deep-link the human to `https://trycontexthub.com`.
+- **Never call a console API endpoint from an agent context.** The console API (`apps/api/src/server.ts`) authenticates with a Clerk browser session JWT only. An OAuth or `afs_` credential gets 401 every time. For anything needing the cross-principal view, deep-link the human to `https://agentlefs.com`.
 - Never diagnose "connected but empty" as a broken connection. It is an authorization outcome, and saying so correctly is the difference between a useful answer and a wasted hour.
 - Never conclude the store is empty from an empty view. See the `authorization-model` skill.

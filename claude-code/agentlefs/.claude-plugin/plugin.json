@@ -1,15 +1,15 @@
 {
-  "name": "contexthub",
-  "displayName": "ContextHub",
+  "name": "agentlefs",
+  "displayName": "agentleFS",
   "version": "0.2.0",
   "description": "Reach your organization's permissioned context over MCP, with browser sign-in and commands that explain who can see what.",
   "author": {
-    "name": "ContextHub"
+    "name": "agentleFS"
   },
-  "homepage": "https://trycontexthub.com",
+  "homepage": "https://agentlefs.com",
   "keywords": [
     "mcp",
-    "contexthub",
+    "agentlefs",
     "knowledge",
     "permissions",
     "authorization",

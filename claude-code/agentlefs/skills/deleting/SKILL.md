@@ -1,9 +1,9 @@
 ---
 name: deleting
-description: How to delete something from ContextHub without destroying more than intended. Use whenever a deletion is on the table — removing a document, clearing out a directory, deleting a folder, cleaning up after a migration or a bad ingest — and before calling mcp__contexthub__delete_org_doc for any reason. Also use to explain why a delete was refused, or why deletion needs two calls.
+description: How to delete something from agentleFS without destroying more than intended. Use whenever a deletion is on the table — removing a document, clearing out a directory, deleting a folder, cleaning up after a migration or a bad ingest — and before calling mcp__agentlefs__delete_org_doc for any reason. Also use to explain why a delete was refused, or why deletion needs two calls.
 ---
 
-# Deleting from ContextHub
+# Deleting from agentleFS
 
 Deletion is the one mutation with no inverse. A write leaves the previous version in
 history and a rename relocates something that still exists; a delete ends the object.
@@ -15,7 +15,7 @@ a human decides, and only then do you delete.**
 
 ## The tool makes you do it in two calls
 
-`mcp__contexthub__delete_org_doc` will not delete on a first call. Call it without
+`mcp__agentlefs__delete_org_doc` will not delete on a first call. Call it without
 `confirm_token` and it deletes nothing — it returns what *would* go, plus a token:
 
 ```
@@ -66,7 +66,7 @@ unless they ask; the answer to "should this be gone" was no.
   radius and will not appear.
 - **A connector line changes the decision.** If the folder mirrors a GitHub repo or
   a Drive folder, deleting it here stops that sync. The upstream content survives;
-  the organization's access to it through ContextHub does not. Say this out loud —
+  the organization's access to it through agentleFS does not. Say this out loud —
   people delete folders thinking they are tidying a copy.
 - **Reach grants go with a folder.** Everyone who could reach it loses that, and the
   grants do not come back if the folder is later recreated under the same name.

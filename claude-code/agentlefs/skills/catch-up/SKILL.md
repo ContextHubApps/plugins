@@ -1,6 +1,6 @@
 ---
 name: catch-up
-description: Work out what the user has been doing in ContextHub recently, so a fresh session can find the right documents fast instead of guessing. Use at the START of a session as soon as you know roughly what the user wants — especially when they say "catch me up", "what was I working on", "where did I leave off", "get up to speed", "remind me what's going on with X", or when they refer to ongoing work ("the pricing thing", "that migration", "my spec") as though you should already know what they mean. Also use before searching ContextHub when the request clearly concerns their current work but you have no idea which folder holds it, since orienting first is usually cheaper than searching blind.
+description: Work out what the user has been doing in agentleFS recently, so a fresh session can find the right documents fast instead of guessing. Use at the START of a session as soon as you know roughly what the user wants — especially when they say "catch me up", "what was I working on", "where did I leave off", "get up to speed", "remind me what's going on with X", or when they refer to ongoing work ("the pricing thing", "that migration", "my spec") as though you should already know what they mean. Also use before searching agentleFS when the request clearly concerns their current work but you have no idea which folder holds it, since orienting first is usually cheaper than searching blind.
 ---
 
 # Catch up on what the user has been working on
@@ -48,7 +48,7 @@ Read it first. It governs how much weight the rest deserves:
 | Under ~5 documents | A weak signal — real, but it could be noise | Let it break ties. Never let it steer. |
 | A dozen or more across folders | A genuine picture of where they work | Aim your search with it. |
 
-Adoption of ContextHub varies enormously — some people put everything in it, some
+Adoption of agentleFS varies enormously — some people put everything in it, some
 put in fragments. A confident-sounding account of someone's work built on four
 events is worse than admitting you cannot tell, because the user has no way to see
 that it was invented. When the basis is thin, the honest move is one sentence
@@ -60,7 +60,7 @@ This is the part that goes wrong, so it is worth being precise about.
 
 Orientation tells you where this person's work *tends* to live. That is a strong
 hint and a terrible filter. If their activity is all in `product/` and they ask
-about a deployment runbook, passing `folder: "product"` to `search_org_knowledge`
+about a deployment runbook, passing `location: "product"` to `search_org_knowledge`
 guarantees you miss it — and you will never find out, because a search that
 returns nothing looks exactly like a subject nobody wrote about.
 

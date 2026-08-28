@@ -1,14 +1,14 @@
 {
-  "name": "contexthub",
-  "description": "ContextHub plugins for AI coding agents. Published from the ContextHub source repo; do not edit here, changes are overwritten on release.",
+  "name": "agentlefs",
+  "description": "agentleFS plugins for AI coding agents. Published from the agentleFS source repo; do not edit here, changes are overwritten on release.",
   "owner": {
-    "name": "ContextHub",
-    "url": "https://trycontexthub.com"
+    "name": "agentleFS",
+    "url": "https://agentlefs.com"
   },
   "plugins": [
     {
-      "name": "contexthub",
-      "source": "./claude-code/contexthub",
+      "name": "agentlefs",
+      "source": "./claude-code/agentlefs",
       "description": "Reach your organization's permissioned context over MCP, with browser sign-in and commands that explain who can see what."
     }
   ]

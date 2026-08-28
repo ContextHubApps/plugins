@@ -1,13 +1,13 @@
-# ContextHub plugins
+# agentleFS plugins
 
-Plugins that connect AI coding agents to [ContextHub](https://trycontexthub.com), a
+Plugins that connect AI coding agents to [agentleFS](https://agentlefs.com), a
 permissioned org-context store. Your agent reaches what you are granted and nothing
 else, and the authorization filter runs inside the query rather than as an
 afterthought.
 
-> **Generated repo.** Published from the ContextHub source repo on release. Do not
+> **Generated repo.** Published from the agentleFS source repo on release. Do not
 > open PRs here, edits are overwritten by the next publish. File issues at
-> [trycontexthub.com](https://trycontexthub.com).
+> [agentlefs.com](https://agentlefs.com).
 
 ## Why bother
 
@@ -16,7 +16,7 @@ works** - why you picked Postgres over Dynamo, who owns the billing service, wha
 last postmortem concluded. Ask it today and you get confident generic advice, or an
 apology about not having access to your internal docs.
 
-ContextHub is where that knowledge lives, filtered to what you're actually granted. The
+agentleFS is where that knowledge lives, filtered to what you're actually granted. The
 plugin is what makes your agent reach for it unprompted, and - just as importantly - what
 stops it from telling you "your org never documented this" when the honest answer is "I
 can't see that."
@@ -27,7 +27,7 @@ can't see that."
 
 ```
 /plugin marketplace add ContextHubApps/plugins
-/plugin install contexthub@contexthub
+/plugin install agentlefs@agentlefs
 ```
 
 **2. Restart Claude Code.** The plugin's MCP server only comes up on a fresh start.
@@ -36,7 +36,7 @@ Skipping this is the single most common reason the tools don't appear.
 **3. Connect.**
 
 ```
-/contexthub:connect
+/agentlefs:connect
 ```
 
 A browser window opens. Sign in. That's it.
@@ -47,7 +47,7 @@ so the client registers itself and this repo ships no credential of any kind.
 > **You'll see an HTTP 401 first, and that's normal.** The 401 carries the header that
 > *triggers* the browser sign-in - it's the mechanism working, not a failure. Don't debug it.
 
-Once you're in, `/contexthub:connect` verifies with a real call and tells you which state
+Once you're in, `/agentlefs:connect` verifies with a real call and tells you which state
 you're in: connected and granted, connected but reaching nothing, or not signed in. Those
 three need completely different fixes.
 
@@ -57,7 +57,7 @@ New store with nothing in it? Semantic search works, but it has nothing to searc
 this to seed it from what your agent already learned about your project:
 
 ```
-Use ContextHub as our team's long-term memory. Call list_org_folders to see what
+Use agentleFS as our team's long-term memory. Call list_org_folders to see what
 I reach. Then take everything you've learned about this project - architecture
 decisions, gotchas, conventions, anything a new teammate would need - and write
 each as its own doc with write_org_doc. Match the frontmatter (type + tags) of
@@ -69,7 +69,7 @@ isn't empty. Tell me what you wrote and where.
 ### Copy-paste: make it a habit
 
 ```
-From now on, check ContextHub before answering anything about how *we* do things,
+From now on, check agentleFS before answering anything about how *we* do things,
 and write durable conclusions back with write_org_doc so the next session inherits
 them. If a search comes back thin, say it may be a permission boundary rather than
 telling me nothing exists.
@@ -77,17 +77,17 @@ telling me nothing exists.
 
 | Command | Answers |
 |---------|---------|
-| `/contexthub:connect` | Get me connected, and tell me why I see nothing |
-| `/contexthub:permissions` | What does *this* credential actually reach? |
-| `/contexthub:share` | What am I about to share, and how far does it cascade? |
-| `/contexthub:who-can-see` | Who can see this? |
-| `/contexthub:catch-up` | What was I working on, and what's the next step? |
+| `/agentlefs:connect` | Get me connected, and tell me why I see nothing |
+| `/agentlefs:permissions` | What does *this* credential actually reach? |
+| `/agentlefs:share` | What am I about to share, and how far does it cascade? |
+| `/agentlefs:who-can-see` | Who can see this? |
+| `/agentlefs:catch-up` | What was I working on, and what's the next step? |
 
 Also included, and triggered by what you ask rather than by a slash command:
 
 | Skill | Fires when |
 |---|---|
-| `catch-up` | You refer to ongoing work as though the agent should already know — the same ground as `/contexthub:catch-up`, without having to ask for it |
+| `catch-up` | You refer to ongoing work as though the agent should already know — the same ground as `/agentlefs:catch-up`, without having to ask for it |
 | `sync-conversation` | You want this session written back to the store as a durable document |
 | `deleting` | Something is about to be removed, and the blast radius needs saying out loud first |
 | `authorization-model` | Anything turns on who can read what, or a result comes back thinner than expected |
@@ -98,15 +98,15 @@ Plus two agents: `context-researcher` for grounded retrieve-and-cite work, and
 by instruction.
 
 **Self-hosted?** The endpoint is a single literal line in
-`claude-code/contexthub/.mcp.json` - point it at your own host (keeping the `/mcp`
+`claude-code/agentlefs/.mcp.json` - point it at your own host (keeping the `/mcp`
 path) and load the directory with `claude --plugin-dir`. It is deliberately not a
 templated value, because the interpolation Claude Code supports is not portable to
 other agents and produced a server that silently never connected.
 
 ## Other agents
 
-ContextHub is a plain MCP server, so any MCP-capable client can connect to
-`https://mcp.trycontexthub.com/mcp` today - OAuth for humans, or a `cht_` bearer
+agentleFS is a plain MCP server, so any MCP-capable client can connect to
+`https://mcp.agentlefs.com/mcp` today - OAuth for humans, or a `afs_` bearer
 token for headless and CI use. Client-specific packaging lands here as its own
 directory (`codex/`, and so on) as each client's extension model supports it.
 
@@ -116,16 +116,16 @@ the initial 401 and report "startup failed." Mint a token and set one header:
 
 | Field | Value |
 |---|---|
-| URL | `https://mcp.trycontexthub.com/mcp` |
+| URL | `https://mcp.agentlefs.com/mcp` |
 | Header name | `Authorization` |
-| Header value | `Bearer cht_...` |
+| Header value | `Bearer afs_...` |
 
 Scope it by minting against a narrow principal - a token in a desktop app's config
 carries that principal's roles, and it's revocable if the config ever leaks.
 
 ## The one thing worth knowing
 
-**Denied is byte-identical to not-found.** ContextHub exposes no existence oracle: a
+**Denied is byte-identical to not-found.** agentleFS exposes no existence oracle: a
 document you cannot read answers exactly like a document that does not exist, and a
 folder you do not reach is simply absent. That is deliberate - the alternative leaks
 the shape of what you cannot see.

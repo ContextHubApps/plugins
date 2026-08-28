@@ -1,9 +1,9 @@
 ---
 name: sync-conversation
-description: Persist the current AI session's conversation into ContextHub as a durable document. Use when the user asks to sync, save, capture, persist, archive, or write up this conversation, session, chat, or thread to ContextHub; when they want a record of what was decided or figured out here; or when they say something like "put this in ContextHub" or "remember this for next time". Always asks where it should land, defaulting to the user's own home folder.
+description: Persist the current AI session's conversation into agentleFS as a durable document. Use when the user asks to sync, save, capture, persist, archive, or write up this conversation, session, chat, or thread to agentleFS; when they want a record of what was decided or figured out here; or when they say something like "put this in agentleFS" or "remember this for next time". Always asks where it should land, defaulting to the user's own home folder.
 ---
 
-# Sync this conversation to ContextHub
+# Sync this conversation to agentleFS
 
 A session ends and everything in it is gone. This turns the conversation into a
 document the next agent — or the next person — inherits.
@@ -24,8 +24,8 @@ made from, and it is also the connection check.
 | Outcome | Do this |
 |---|---|
 | One or more folders | Continue to Step 2. |
-| Empty list | Stop. This credential reaches nothing to write into. Send them to `/contexthub:connect`. Do **not** report the organization as having no content — see the `authorization-model` skill. |
-| Error / tools missing | Stop and diagnose with the `connection` skill. Do not paraphrase a 401 as "ContextHub is down". |
+| Empty list | Stop. This credential reaches nothing to write into. Send them to `/agentlefs:connect`. Do **not** report the organization as having no content — see the `authorization-model` skill. |
+| Error / tools missing | Stop and diagnose with the `connection` skill. Do not paraphrase a 401 as "agentleFS is down". |
 
 ## Step 2 — ask where it goes, defaulting to their home
 
@@ -58,9 +58,9 @@ Now ask, with the default pre-selected. Offer:
 - **A shared folder** — name the specific reachable folders from Step 1 that plausibly
   fit, and say plainly that anyone granted on that folder will be able to read the
   conversation.
-- **Somewhere else** — let them name folder and path.
+- **Somewhere else** — let them name the full location.
 
-Confirm the exact `folder` + `path` back to them before writing. A path is cheap to
+Confirm the exact `location` back to them before writing. A path is cheap to
 get right now and expensive to move later: moving a file re-permissions it.
 
 ## Step 3 — read the neighbors
@@ -140,20 +140,27 @@ If in doubt about a passage, leave it out and say you did.
 
 ## Step 5 — write
 
-Call `write_org_doc` with the confirmed folder and path.
+Call `write_org_doc` with the confirmed `location`.
 
-- `how="commit"` (the default) for their own home or a folder that is clearly theirs.
-- `how="propose"` when writing into someone else's area, or when the content is
-  sensitive. Say which you chose and why.
-
-Read the response. If it says **quarantined** or **pending operator promotion**, the
-document is not yet agent-visible. Report that as its actual state, not as a success.
+It commits if their grant allows it and is refused if it does not — there is no
+staging option and no review queue, so a successful write is live immediately. If it
+is refused, say so plainly and say where they could write instead.
 
 ## Step 6 — report
 
-State the folder, the full path, and the landing state (committed / quarantined /
-proposed). Name what you deliberately left out. If it went to their home, remind them
-it is private to them and that `/contexthub:share` is how it reaches anyone else.
+State the folder and the full path, and **hand over the link the write returned** —
+the confirmation ends with `— cite: <url>`, and that is the openable half. A commit
+hash is not something anyone can click, and a document nobody opens is a document
+that may as well not have been written.
+
+The confirmation also says whether it CREATED the document or OVERWROTE one, and
+names any directory that did not exist before. Read both back before you report:
+"overwrote" on a document you meant to create, or a directory you did not expect to
+be new, means you wrote somewhere other than where you meant to — say so rather than
+reporting a clean write.
+
+Name what you deliberately left out. If it went to their home, remind them it is
+private to them and that `/agentlefs:share` is how it reaches anyone else.
 
 ## Do not
 
@@ -162,6 +169,6 @@ it is private to them and that `/contexthub:share` is how it reaches anyone else
 - Do not write secrets, even ones the user pasted themselves.
 - Do not invent a home folder that did not appear in `list_org_folders`.
 - Do not create a second document for a conversation that already has one.
-- Do not report a quarantined or proposed write as though it were live.
+- Do not report a refused write as though it had landed.
 - Do not claim you shared it with anyone. Writing is not sharing; grants happen in
   the console.

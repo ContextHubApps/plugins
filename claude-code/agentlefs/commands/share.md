@@ -1,19 +1,19 @@
 ---
-description: Plan sharing a ContextHub folder or document, then hand off to the console
+description: Plan sharing a agentleFS folder or document, then hand off to the console
 argument-hint: [folder-or-path]
-allowed-tools: mcp__contexthub__list_org_folders, mcp__contexthub__list_org_docs
+allowed-tools: mcp__agentlefs__list_org_folders, mcp__agentlefs__list_org_docs
 ---
 
 Help the user share `$1` with someone. Your job is to get the decision right and show its blast radius **before** they click. The grant itself happens in the console, because this credential cannot mutate grants.
 
-Target: `$1` (a folder, or a `folder` plus `path` for a single document). If `$ARGUMENTS` is empty, call `mcp__contexthub__list_org_folders` with no arguments, show the reachable folders, and ask which one they mean.
+Target: `$1` (a `location` — a full path from the workspace root, naming either a folder like `product` or a single document like `product/runbooks/deploy.md`). If `$ARGUMENTS` is empty, call `mcp__agentlefs__list_org_folders` with no arguments, show the reachable folders, and ask which one they mean.
 
 ## Step 1 - orient on what the recipient would get
 
 Do this first. Sharing decisions go wrong because the sharer does not know how much is under the thing they are sharing.
 
-- For a folder: call `mcp__contexthub__list_org_folders` with that folder. Report how many files are there, the type breakdown, and the labels.
-- For a single document: call `mcp__contexthub__list_org_docs` with the folder and path to confirm the path exists and is the intended file.
+- For a folder: call `mcp__agentlefs__list_org_folders` with that folder. Report how many files are there, the type breakdown, and the labels.
+- For a single document: call `mcp__agentlefs__list_org_docs` with the document's `location` to confirm it exists and is the intended file.
 
 Then state the blast radius explicitly: **grants cascade down the folder tree.** A grant on a folder reaches every descendant of that folder, including subdirectories and files added later. A grant scoped to one document reaches only that document.
 
@@ -34,8 +34,9 @@ Three roles are offered outward. The console labels them view / edit / manage.
 Guidance to give:
 
 - Default to view. Escalate only on a stated need.
-- `writer` implies `reader`. `owner` is not a rung of the relation ladder (the model states `writer ⟹ reader` but `owner ⇏ writer`), because ownership is a fact about a thing rather than a level of access. The authority layer folds it anyway: an owner satisfies the writer bar, so both the console and MCP give the same answer. Treat manage as "accountable for it, and can change it".
-- There are also internal roles `proposer` and `member`. `proposer` folds to reader for read purposes and suits a contributor who should stage changes for review rather than commit them.
+- **One ladder: `reader` < `writer` < `owner`.** Each rung contains the one below it, so an owner reads and writes everything at or below what it owns, and additionally grants and revokes there. Treat manage as "accountable for it, and can change it".
+- The ladder is stated once, in `openfga/model.fga`, and there is no app-layer fold — asking the engine for `writer` already returns allow for an owner, so the console and MCP cannot give different answers. This guidance used to say `owner ⇏ writer` and that the authority layer folded it; that was the pre-#219 model.
+- There are three roles and no others. `proposer` and `member` are retired, and neither was ever granted to anyone.
 
 Pick the narrowest scope that does the job. A document-scoped grant is almost always safer than a folder-scoped one, and re-sharing a second document later is cheap.
 
@@ -45,7 +46,7 @@ You cannot perform the grant. There is no MCP tool that creates, modifies, or re
 
 Give the user the deep link and name the screen:
 
-- Open `https://trycontexthub.com`, navigate to the folder or file, and open the **Share panel**.
+- Open `https://agentlefs.com`, navigate to the folder or file, and open the **Share panel**.
 - Enter the recipient's email and pick view, edit, or manage.
 - For time-boxed outside access, the same panel offers a **7-day share link**.
 - To share with a group rather than a person, use **Groups**. Group membership nests, so a grant to a group reaches its nested member groups too.
