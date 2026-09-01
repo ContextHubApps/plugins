@@ -21,7 +21,7 @@ plugin is what makes your agent reach for it unprompted, and - just as important
 stops it from telling you "your org never documented this" when the honest answer is "I
 can't see that."
 
-## Get connected (3 steps, about a minute)
+## Claude Code and Claude Desktop (3 steps, about a minute)
 
 **1. Add the marketplace and install.**
 
@@ -82,6 +82,7 @@ telling me nothing exists.
 | `/agentlefs:share` | What am I about to share, and how far does it cascade? |
 | `/agentlefs:who-can-see` | Who can see this? |
 | `/agentlefs:catch-up` | What was I working on, and what's the next step? |
+| `/agentlefs:seed` | The store is empty - fill it from what the agent already learned |
 
 Also included, and triggered by what you ask rather than by a slash command:
 
@@ -99,17 +100,49 @@ Plus two agents: `context-researcher` for grounded retrieve-and-cite work, and
 by instruction.
 
 **Self-hosted?** The endpoint is a single literal line in
-`claude-code/agentlefs/.mcp.json` - point it at your own host (keeping the `/mcp`
+`plugins/agentlefs/.mcp.json` - point it at your own host (keeping the `/mcp`
 path) and load the directory with `claude --plugin-dir`. It is deliberately not a
 templated value, because the interpolation Claude Code supports is not portable to
 other agents and produced a server that silently never connected.
+
+## Codex
+
+Same package, same marketplace, same browser sign-in. Codex registers a marketplace
+from the SHELL and installs from inside the session, which is the one step people
+expect to work the other way round.
+
+**1. Add the marketplace** in a terminal:
+
+```
+codex plugin marketplace add ContextHubApps/plugins
+```
+
+**2. Install it.** In the CLI, start `codex` and run `/plugins` to open the plugin
+browser, then install **agentleFS** from the agentleFS marketplace. In Codex in the
+ChatGPT desktop app, restart the app first - it reads its marketplace sources at
+startup - then install from the Plugins directory.
+
+**3. Sign in** when Codex asks. A browser window opens, and there is no token to paste
+here either.
+
+What Codex loads from the package is `skills/` and the MCP server. The `commands/` and
+`agents/` directories are Claude Code artifacts and are simply not read - they ship in
+the same directory because one package serves both ecosystems, not because Codex has
+them. `codex mcp list` will not show the server, and that is not a failed install: a
+plugin-provided server is launched by the plugin rather than configured as an
+`[mcp_servers.*]` entry in `config.toml`.
+
+**The ChatGPT web and mobile apps are a different path.** They install from the
+universal public plugin directory, which is a submission-and-review process rather
+than a repository you can add, so a marketplace does not reach them. Until agentleFS is
+listed there, use the MCP server URL directly in developer mode.
 
 ## Other agents
 
 agentleFS is a plain MCP server, so any MCP-capable client can connect to
 `https://mcp.agentlefs.com/mcp` today - OAuth for humans, or a `afs_` bearer
-token for headless and CI use. Client-specific packaging lands here as its own
-directory (`codex/`, and so on) as each client's extension model supports it.
+token for headless and CI use. Cursor, Gemini CLI, VS Code and Cline take that URL;
+Cursor's own plugin format needs a manual review before listing, and is its own job.
 
 **If your client doesn't do OAuth, you need a bearer token.** Many desktop clients
 send only the headers you configure and never walk the discovery chain, so they get

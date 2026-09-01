@@ -1,0 +1,20 @@
+{
+  "name": "agentlefs",
+  "interface": {
+    "displayName": "agentleFS"
+  },
+  "plugins": [
+    {
+      "name": "agentlefs",
+      "source": {
+        "source": "local",
+        "path": "./plugins/agentlefs"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "agentlefs",
-      "source": "./claude-code/agentlefs",
+      "source": "./plugins/agentlefs",
       "description": "Reach your organization's permissioned context over MCP, with browser sign-in and commands that explain who can see what."
     }
   ]
