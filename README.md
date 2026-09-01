@@ -92,6 +92,7 @@ Also included, and triggered by what you ask rather than by a slash command:
 | `deleting` | Something is about to be removed, and the blast radius needs saying out loud first |
 | `authorization-model` | Anything turns on who can read what, or a result comes back thinner than expected |
 | `connection` | The tools are missing, returning 401, or connected but reaching nothing |
+| `publishing` | A folder is to be packaged for reuse elsewhere — including the difference between publishing it and simply letting someone read it |
 
 Plus two agents: `context-researcher` for grounded retrieve-and-cite work, and
 `access-reviewer` for read-only access review — read-only by tool allowlist rather than
